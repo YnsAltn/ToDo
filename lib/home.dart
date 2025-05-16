@@ -1,4 +1,13 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:todo/features/home/presentation/screens/add_spend/view/add_spend_view.dart';
+import 'package:todo/features/home/presentation/screens/add_task/view/add_task_view.dart';
+import 'package:todo/features/home/presentation/screens/home/view/home_view.dart';
+import 'package:todo/features/home/presentation/screens/settings/views/settings_view.dart';
+import 'package:todo/features/home/presentation/screens/shopping_list/view/shopping_list_view.dart';
+
+final selectedIndexProvider = StateProvider<int>((ref) => 0);
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -7,27 +16,57 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedIndex = ref.watch(selectedIndexProvider);
 
-    final List<Widget> pages = const [HomePage(), SearchPage(), ProfilePage()];
-
-    final List<String> titles = const ['Ana Sayfa', 'Arama', 'Profil'];
-
-    PreferredSizeWidget? _buildAppBar() {
-      return AppBar(title: Text(titles[selectedIndex]));
-    }
+    final pages = const [
+      HomeView(),
+      AddNewTaskView(),
+      ShoppingListView(),
+      AddSpendView(),
+      ProfileView(),
+    ];
 
     return Scaffold(
-      appBar: _buildAppBar(),
       body: IndexedStack(index: selectedIndex, children: pages),
       bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        backgroundColor: Colors.white,
+        elevation: 0,
+        selectedItemColor: Colors.teal,
+        unselectedItemColor: Colors.grey,
         currentIndex: selectedIndex,
         onTap:
             (index) => ref.read(selectedIndexProvider.notifier).state = index,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Ana Sayfa'),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Arama'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profil'),
+        items: [
+          _buildNavItem(Icons.home, 'Ana Sayfa', selectedIndex == 0),
+          _buildNavItem(Icons.add_task, 'Görev Ekle', selectedIndex == 1),
+          _buildNavItem(
+            Icons.shopping_bag_outlined,
+            'Alışveriş',
+            selectedIndex == 2,
+          ),
+          _buildNavItem(Icons.attach_money, 'Harcama', selectedIndex == 3),
+          _buildNavItem(Icons.person, 'Profil', selectedIndex == 4),
         ],
       ),
+    );
+  }
+
+  BottomNavigationBarItem _buildNavItem(
+    IconData icon,
+    String label,
+    bool isActive,
+  ) {
+    return BottomNavigationBarItem(
+      icon: AnimatedContainer(
+        height: 30.h,
+        duration: Duration(milliseconds: 1000),
+        padding: EdgeInsets.all(5.h),
+        decoration: BoxDecoration(
+          color: isActive ? Colors.teal.withOpacity(0.1) : Colors.transparent,
+          borderRadius: BorderRadius.circular(10.r),
+        ),
+        child: Icon(icon, size: isActive ? 28 : 24),
+      ),
+      label: label,
     );
   }
 }

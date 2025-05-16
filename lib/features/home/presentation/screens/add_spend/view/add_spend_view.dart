@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:todo/features/home/presentation/widgets/drawer.dart';
 
 final Map<String, double> expenses = {
   "Yemek": 500,
@@ -12,25 +14,195 @@ final Map<String, double> expenses = {
   "Eğlenfce": 50,
   "Faturda": 400,
 };
+final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+final selectedCategoryProvider = StateProvider<String>((ref) => '');
 
-class AddSpendView extends StatelessWidget {
+class AddSpendView extends ConsumerWidget {
   const AddSpendView({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final selected = ref.watch(selectedCategoryProvider);
+
     return Scaffold(
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.deepPurpleAccent,
+        backgroundColor: Colors.teal,
         onPressed: () {
-          debugPrint("Butona tıklandı");
+          showModalBottomSheet(
+            backgroundColor: Colors.white,
+            context: context,
+            builder: (BuildContext conntext) {
+              return SizedBox(
+                height: 350.h,
+                child: Padding(
+                  padding: EdgeInsets.all(15.w),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: 30.h),
+                      Text(
+                        "Harcanan Yer",
+                        style: TextStyle(
+                          fontSize: 18.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 10.h),
+                      TextFormField(
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Colors.white,
+                          hintText: "Harcama sebebini giriniz",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.r),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 20.h),
+                      Text(
+                        "Miktar",
+                        style: TextStyle(
+                          fontSize: 18.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 10.h),
+                      TextFormField(
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Colors.white,
+                          hintText: "Harcanan miktar",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.r),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 15.h),
+                      Row(
+                        children: [
+                          Text(
+                            'Kategori:',
+                            style: TextStyle(
+                              fontSize: 18.sp,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Consumer(
+                            builder: (context, ref, _) {
+                              final selected = ref.watch(
+                                selectedCategoryProvider,
+                              );
+                              return PopupMenuButton<String>(
+                                color: Colors.white,
+                                onSelected: (value) {
+                                  ref
+                                      .read(selectedCategoryProvider.notifier)
+                                      .state = value;
+                                },
+                                itemBuilder:
+                                    (context) =>
+                                        spendCategory
+                                            .map(
+                                              (e) => PopupMenuItem<String>(
+                                                value: e,
+                                                child: Text(
+                                                  e,
+                                                  style: TextStyle(
+                                                    fontSize: 15.sp,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ),
+                                            )
+                                            .toList(),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 8,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color: Colors.grey.shade300,
+                                    ),
+                                    borderRadius: BorderRadius.circular(6),
+                                    color: Colors.white,
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        selected.isEmpty ? 'Seç' : selected,
+                                        style: TextStyle(
+                                          fontSize: 15.sp,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.teal,
+                                        ),
+                                      ),
+                                      const Icon(Icons.arrow_drop_down),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+
+                      Spacer(),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          ElevatedButton(
+                            style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all(
+                                Colors.teal,
+                              ),
+                            ),
+                            onPressed: () {},
+                            child: Text(
+                              "Ekle",
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 15.sp,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 30.h),
+                    ],
+                  ),
+                ),
+              );
+            },
+          );
         },
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(50.r),
         ),
-        tooltip: 'Artım',
         child: Icon(Icons.add),
       ),
-      appBar: AppBar(title: Text("Harcamalarım")),
+      key: _scaffoldKey,
+      appBar: AppBar(
+        actions: [
+          IconButton(
+            icon: Icon(Icons.notifications, color: Colors.black, size: 30.r),
+            onPressed: () {},
+          ),
+        ],
+        toolbarHeight: 42.h,
+        leading: IconButton(
+          icon: Icon(Icons.menu, color: Colors.white, size: 40.r),
+          onPressed: () {
+            _scaffoldKey.currentState?.openDrawer();
+          },
+        ),
+        title: const Text("Todo App"),
+        centerTitle: true,
+        backgroundColor: Colors.teal,
+      ),
+      drawer: DrawerCard(),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -47,6 +219,16 @@ class AddSpendView extends StatelessWidget {
   }
 }
 
+List<String> spendCategory = [
+  "yemek",
+  "Ev",
+  "Okul",
+  "Giyim",
+  "ulaşım",
+  "eğlence",
+  "ihtiyaç",
+  "diğer",
+];
 List month = [
   "Ocak",
   "Şubat",

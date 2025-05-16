@@ -2,10 +2,12 @@ import 'package:calendar_timeline/calendar_timeline.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:todo/features/home/presentation/screens/add_task/provider/add_task_provider.dart'; // ConsumerWidget için gerekli
+import 'package:todo/features/home/presentation/screens/add_task/provider/add_task_provider.dart';
+import 'package:todo/features/home/presentation/widgets/drawer.dart'; // ConsumerWidget için gerekli
 
 final _taskHeader = TextEditingController();
 final _taskDescription = TextEditingController();
+final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
 class AddNewTaskView extends ConsumerStatefulWidget {
   const AddNewTaskView({super.key});
@@ -31,7 +33,26 @@ class _AddNewTaskViewState extends ConsumerState<AddNewTaskView> {
     final addTaskNotifier = ref.read(addTaskProvider.notifier);
     final addTaskState = ref.watch(addTaskProvider);
     return Scaffold(
-      appBar: AppBar(title: Text("Yeni Görev")),
+      key: _scaffoldKey,
+      appBar: AppBar(
+        actions: [
+          IconButton(
+            icon: Icon(Icons.notifications, color: Colors.black, size: 30.r),
+            onPressed: () {},
+          ),
+        ],
+        toolbarHeight: 42.h,
+        leading: IconButton(
+          icon: Icon(Icons.menu, color: Colors.white, size: 40.r),
+          onPressed: () {
+            _scaffoldKey.currentState?.openDrawer();
+          },
+        ),
+        title: const Text("Todo App"),
+        centerTitle: true,
+        backgroundColor: Colors.teal,
+      ),
+      drawer: DrawerCard(),
       body: SingleChildScrollView(
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 20.w),

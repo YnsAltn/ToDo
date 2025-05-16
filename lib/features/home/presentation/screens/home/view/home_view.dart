@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
-import 'package:todo/features/home/components/bottom_navigationbar.dart';
 import 'package:todo/features/home/presentation/widgets/drawer.dart';
 
 final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -34,23 +32,21 @@ class _HomeViewState extends ConsumerState<HomeView> {
             onPressed: () {},
           ),
         ],
-        toolbarHeight: 50.h,
+        toolbarHeight: 42.h,
         leading: IconButton(
-          icon: Icon(
-            Icons.account_circle_rounded,
-            color: Colors.white,
-            size: 40.r,
-          ),
+          icon: Icon(Icons.menu, color: Colors.white, size: 40.r),
           onPressed: () {
             _scaffoldKey.currentState?.openDrawer();
           },
         ),
         title: const Text("Todo App"),
         centerTitle: true,
-        backgroundColor: Colors.red,
+        backgroundColor: Colors.teal,
       ),
       drawer: DrawerCard(),
-      body: Column(children: [DateWidget(), TasksWidget()]),
+      body: SingleChildScrollView(
+        child: Column(children: [DateWidget(), TasksWidget()]),
+      ),
     );
   }
 }
@@ -184,12 +180,7 @@ class TasksWidget extends StatelessWidget {
               subtitle: Text("Bu ayki toplam harcaman 2000 TL."),
             ),
           ),
-          ElevatedButton(
-            onPressed: () {
-              context.push("/add-spend");
-            },
-            child: Text("Detaylara Git"),
-          ),
+          ElevatedButton(onPressed: () {}, child: Text("Detaylara Git")),
         ],
       ),
     );
