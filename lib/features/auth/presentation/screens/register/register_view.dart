@@ -97,6 +97,11 @@ class RegisterView extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 20.h),
+                ListTile(
+                  title: Text("Sözleşmeyi kabul ediyorum"),
+                  leading: Switch(value: true, onChanged: (value) {}),
+                ),
+                SizedBox(height: 20.h),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     fixedSize: Size(320.w, 45.h),

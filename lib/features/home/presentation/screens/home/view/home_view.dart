@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:todo/features/home/components/bottom_navigationbar.dart';
 import 'package:todo/features/home/presentation/widgets/drawer.dart';
+
+final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
 var now = DateTime.now();
 var year = now.year;
@@ -9,18 +13,16 @@ var month = now.month;
 var day = now.day;
 var hour = now.hour;
 var minute = now.minute;
-var second = now.second;
 var weekday = now.weekday;
-final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-class HomeView extends StatefulWidget {
+class HomeView extends ConsumerStatefulWidget {
   const HomeView({super.key});
 
   @override
-  State<HomeView> createState() => _HomeViewState();
+  ConsumerState<HomeView> createState() => _HomeViewState();
 }
 
-class _HomeViewState extends State<HomeView> {
+class _HomeViewState extends ConsumerState<HomeView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -88,7 +90,7 @@ class DateWidget extends StatelessWidget {
                   getDayName(weekday),
                   style: TextStyle(
                     color: Colors.grey[700],
-                    fontSize: 25.sp,
+                    fontSize: 23.sp,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -155,7 +157,6 @@ class TasksWidget extends StatelessWidget {
             ),
           ),
           SizedBox(height: 10.h),
-
           Card(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(5.r),
@@ -166,7 +167,7 @@ class TasksWidget extends StatelessWidget {
                 style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
               ),
               trailing: Icon(Icons.shopping_cart, size: 30.r),
-              subtitle: Text("Tamamlanmamış Alışverişin var."),
+              subtitle: Text("Tamamlanmamış alışverişin var."),
             ),
           ),
           SizedBox(height: 10.h),
@@ -185,9 +186,9 @@ class TasksWidget extends StatelessWidget {
           ),
           ElevatedButton(
             onPressed: () {
-              context.push("/register");
+              context.push("/add-spend");
             },
-            child: Text("data"),
+            child: Text("Detaylara Git"),
           ),
         ],
       ),

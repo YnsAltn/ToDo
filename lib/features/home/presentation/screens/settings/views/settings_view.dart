@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:todo/features/home/components/bottom_navigationbar.dart';
 import 'package:todo/features/home/presentation/screens/settings/provider/settings_provider.dart';
-
-final darkModeSwitc = false;
 
 class ProfileView extends StatefulWidget {
   const ProfileView({super.key});

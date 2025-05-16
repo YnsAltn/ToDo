@@ -1,32 +1,36 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:todo/features/auth/presentation/screens/login/login_view.dart';
-import 'package:todo/features/auth/presentation/screens/register/register_view.dart';
-import 'package:todo/features/home/presentation/screens/home_view.dart';
+import 'package:todo/features/home/components/bottom_navigationbar.dart';
+import 'package:todo/features/home/presentation/screens/add_spend/view/add_spend_view.dart';
+import 'package:todo/features/home/presentation/screens/add_task/view/add_task_view.dart';
+import 'package:todo/features/home/presentation/screens/home/view/home_view.dart';
 import 'package:todo/features/home/presentation/screens/settings/views/settings_view.dart';
-import 'package:todo/splash_view.dart';
 
 final GoRouter router = GoRouter(
+  initialLocation: '/home',
   routes: [
-    GoRoute(path: "/", name: "Home", builder: (context, state) => HomeView()),
-    GoRoute(
-      path: "/splash",
-      name: "SplashView",
-      builder: (context, state) => SplashView(),
-    ),
-    GoRoute(
-      path: "/profile",
-      name: "ProfileView",
-      builder: (context, state) => ProfileView(),
-    ),
-    GoRoute(
-      path: "/login",
-      name: "LoginView",
-      builder: (context, state) => LoginView(),
-    ),
-    GoRoute(
-      path: "/register",
-      name: "RegisterView",
-      builder: (context, state) => RegisterView(),
+    ShellRoute(
+      builder: (context, state, child) {
+        return Scaffold(
+          body: child,
+          bottomNavigationBar: const CustomBottomNavigationBar(),
+        );
+      },
+      routes: [
+        GoRoute(path: '/home', builder: (context, state) => const HomeView()),
+        GoRoute(
+          path: '/add-task',
+          builder: (context, state) => const AddNewTaskView(),
+        ),
+        GoRoute(
+          path: '/profile',
+          builder: (context, state) => const ProfileView(),
+        ),
+        GoRoute(
+          path: '/settings',
+          builder: (context, state) => const AddSpendView(),
+        ),
+      ],
     ),
   ],
 );
