@@ -1,0 +1,17 @@
+✅ Veriler state aracılığı ile firestore'a gidiyor ve ordan da ana ekrana basılabiliyor.
+
+
+
+
+!!!!
+❌ Yarın için yapılacak ilk iş kullanıcı tokenini tutup girişi kaydetmek.
+
+❌ Artı olarak bu eklenen harcamalar pasta diliminde gösterilecek.
+
+❌ Bunun gibi bir yapı ile bu kullanıcıların her biri için depolama alanı yönetilecek
+❌ Bu yapının aynısı task ekleme kısmı için de yapılacak
+    FirebaseFirestore.instance
+     .collection('users')
+     .doc(currentUserId)
+     .collection('tasks')
+     .add({...});

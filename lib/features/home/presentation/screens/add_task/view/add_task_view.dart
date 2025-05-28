@@ -3,11 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:todo/features/home/presentation/screens/add_task/provider/add_task_provider.dart';
-import 'package:todo/features/home/presentation/widgets/drawer.dart'; // ConsumerWidget için gerekli
 
 final _taskHeader = TextEditingController();
 final _taskDescription = TextEditingController();
-final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
 class AddNewTaskView extends ConsumerStatefulWidget {
   const AddNewTaskView({super.key});
@@ -31,90 +29,34 @@ class _AddNewTaskViewState extends ConsumerState<AddNewTaskView> {
   @override
   Widget build(BuildContext context) {
     final addTaskNotifier = ref.read(addTaskProvider.notifier);
-    final addTaskState = ref.watch(addTaskProvider);
     return Scaffold(
-      key: _scaffoldKey,
-      appBar: AppBar(
-        actions: [
-          IconButton(
-            icon: Icon(Icons.notifications, color: Colors.black, size: 30.r),
-            onPressed: () {},
-          ),
-        ],
-        toolbarHeight: 42.h,
-        leading: IconButton(
-          icon: Icon(Icons.menu, color: Colors.white, size: 40.r),
-          onPressed: () {
-            _scaffoldKey.currentState?.openDrawer();
-          },
-        ),
-        title: const Text("Todo App"),
-        centerTitle: true,
-        backgroundColor: Colors.teal,
-      ),
-      drawer: DrawerCard(),
       body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20.w),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "Başlık",
-                style: TextStyle(fontSize: 15.h, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 5.h),
-              TaskHeaderWidget(addTaskNotifier: addTaskNotifier),
-              SizedBox(height: 15.h),
-              Text(
-                "Açıklama",
-                style: TextStyle(fontSize: 15.h, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 5.h),
-              TaskDescriptionWidget(),
-              SizedBox(height: 15.h),
-              Text(
-                "Kategori Seç",
-                style: TextStyle(fontSize: 15.h, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 15.h),
-              CategorySelectionWidget(
-                ref: ref,
-                selectedCategoryId: selectedCategoryId,
-                categoryList: [
-                  "Kişisel",
-                  "Okul",
-                  "İş",
-                  "Alışveriş",
-                  "Ev",
-                  "Diğer",
-                ],
-                onCategorySelected:
-                    (id) => setState(() => selectedCategoryId = id),
-              ),
-              Text(
-                "Tarih ve Saat Seç",
-                style: TextStyle(fontSize: 15.h, fontWeight: FontWeight.bold),
-              ),
-              DateTimePickerWidget(
-                selectedDate: _selectedDate,
-                selectedHour: selectedHour,
-                selectedMinute: selectedMinute,
-                onDateSelected: (date) => setState(() => _selectedDate = date),
-                onHourSelected: (hour) => setState(() => selectedHour = hour),
-                onMinuteSelected:
-                    (minute) => setState(() => selectedMinute = minute),
-              ),
-              SizedBox(height: 20.h),
-              Center(
-                child: Text(
-                  "Seçilen Tarih: $_selectedDate - Saat: $selectedHour:$selectedMinute",
-                  style: const TextStyle(color: Colors.teal, fontSize: 16),
-                ),
-              ),
-              ElevatedButton(onPressed: () {}, child: Text("Task Oluştur")),
-            ],
-          ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(height: 5.h),
+            TaskHeaderWidget(addTaskNotifier: addTaskNotifier),
+            SizedBox(height: 15.h),
+            TaskDescriptionWidget(),
+            SizedBox(height: 15.h),
+            CategorySelectionWidget(
+              ref: ref,
+              selectedCategoryId: selectedCategoryId,
+              categoryList: categoryList,
+              onCategorySelected:
+                  (id) => setState(() => selectedCategoryId = id),
+            ),
+            SizedBox(height: 15.h),
+            DateTimeWidget(
+              selectedDate: _selectedDate,
+              selectedHour: selectedHour,
+              selectedMinute: selectedMinute,
+              onDateSelected: (date) => setState(() => _selectedDate = date),
+              onHourSelected: (hour) => setState(() => selectedHour = hour),
+              onMinuteSelected:
+                  (minute) => setState(() => selectedMinute = minute),
+            ),
+          ],
         ),
       ),
     );
@@ -126,15 +68,29 @@ class TaskDescriptionWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
-      controller: _taskDescription,
-      minLines: 2,
-      maxLines: null,
-      decoration: InputDecoration(
-        filled: true,
-        fillColor: Colors.grey[100],
-        hintText: "Görev Açıklamasını Gir",
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.r)),
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 15.h),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Açıklama",
+            style: TextStyle(fontSize: 15.h, fontWeight: FontWeight.bold),
+          ),
+          TextFormField(
+            controller: _taskDescription,
+            minLines: 2,
+            maxLines: null,
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: Colors.grey[100],
+              hintText: "Görev Açıklamasını Gir",
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(5.r),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -147,20 +103,88 @@ class TaskHeaderWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
-      onChanged: (value) => addTaskNotifier.setHour(int.tryParse(value) ?? 0),
-      controller: _taskHeader,
-      decoration: InputDecoration(
-        filled: true,
-        fillColor: Colors.grey[100],
-        hintText: "Görev Başlığı",
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.r)),
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 15.h),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Başlık",
+            style: TextStyle(fontSize: 15.h, fontWeight: FontWeight.bold),
+          ),
+          TextFormField(
+            onChanged:
+                (value) => addTaskNotifier.setHour(int.tryParse(value) ?? 0),
+            controller: _taskHeader,
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: Colors.grey[100],
+              hintText: "Görev Başlığı",
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(5.r),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
-class DateTimePickerWidget extends StatefulWidget {
+class DateTimeWidget extends StatelessWidget {
+  final DateTime selectedDate;
+  final int selectedHour;
+  final int selectedMinute;
+  final Function(DateTime) onDateSelected;
+  final Function(int) onHourSelected;
+  final Function(int) onMinuteSelected;
+
+  const DateTimeWidget({
+    super.key,
+    required this.selectedDate,
+    required this.selectedHour,
+    required this.selectedMinute,
+    required this.onDateSelected,
+    required this.onHourSelected,
+    required this.onMinuteSelected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(left: 15.h),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Tarih ve Saat Seç",
+            style: TextStyle(fontSize: 15.h, fontWeight: FontWeight.bold),
+          ),
+          DateTimePickerWidget(
+            selectedDate: selectedDate,
+            selectedHour: selectedHour,
+            selectedMinute: selectedMinute,
+            onDateSelected: onDateSelected,
+            onHourSelected: onHourSelected,
+            onMinuteSelected: onMinuteSelected,
+          ),
+          SizedBox(height: 20.h),
+          Center(
+            child: Text(
+              "Seçilen Tarih: ${selectedDate.day.toString().padLeft(2, '0')}/"
+              "${selectedDate.month.toString().padLeft(2, '0')}/"
+              "${selectedDate.year} - Saat: ${selectedHour.toString().padLeft(2, '0')}:${selectedMinute.toString().padLeft(2, '0')}",
+              style: const TextStyle(color: Colors.teal, fontSize: 16),
+            ),
+          ),
+          ElevatedButton(onPressed: () {}, child: Text("Task Oluştur")),
+        ],
+      ),
+    );
+  }
+}
+
+class DateTimePickerWidget extends ConsumerWidget {
   final DateTime selectedDate;
   final int selectedHour;
   final int selectedMinute;
@@ -179,28 +203,23 @@ class DateTimePickerWidget extends StatefulWidget {
   });
 
   @override
-  DateTimePickerWidgetState createState() => DateTimePickerWidgetState();
-}
-
-class DateTimePickerWidgetState extends State<DateTimePickerWidget> {
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Row(
       children: [
         Flexible(
           flex: 2,
           child: CalendarTimeline(
-            initialDate: widget.selectedDate,
-            firstDate: DateTime.now(),
-            lastDate: DateTime.now().add(const Duration(days: 365 * 4)),
-            onDateSelected: widget.onDateSelected,
+            initialDate: selectedDate,
+            firstDate: DateTime.now().subtract(const Duration(days: 365)),
+            lastDate: DateTime.now().add(const Duration(days: 365 * 2)),
+            onDateSelected: onDateSelected,
             monthColor: Colors.black,
             dayColor: Colors.black,
             dayNameColor: Colors.black,
             activeDayColor: Colors.white,
-            shrink: true,
             activeBackgroundDayColor: Colors.redAccent[100],
-            locale: 'en',
+            locale: 'tr',
+            shrink: true,
           ),
         ),
         SizedBox(width: 5.w),
@@ -220,14 +239,14 @@ class DateTimePickerWidgetState extends State<DateTimePickerWidget> {
                 children: [
                   _buildWheelPicker(
                     List.generate(24, (index) => index),
-                    widget.onHourSelected,
-                    widget.selectedHour,
+                    onHourSelected,
+                    selectedHour,
                   ),
                   Text(":", style: TextStyle(fontSize: 15.h)),
                   _buildWheelPicker(
                     List.generate(60, (index) => index),
-                    widget.onMinuteSelected,
-                    widget.selectedMinute,
+                    onMinuteSelected,
+                    selectedMinute,
                   ),
                 ],
               ),
@@ -265,7 +284,14 @@ class DateTimePickerWidgetState extends State<DateTimePickerWidget> {
   }
 }
 
-List categoryList = ["Kişisel", "Okul", "İş", "Alışveriş", "Ev", "Diğer"];
+List<String> categoryList = [
+  "Kişisel",
+  "Okul",
+  "İş",
+  "Alışveriş",
+  "Ev",
+  "Diğer",
+];
 
 class CategorySelectionWidget extends StatelessWidget {
   final WidgetRef ref;
@@ -283,28 +309,41 @@ class CategorySelectionWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 35.h,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: categoryList.length,
-        itemBuilder: (context, index) {
-          final isSelected = selectedCategoryId == index;
+    return Padding(
+      padding: EdgeInsets.only(left: 15.h),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Kategori Seç",
+            style: TextStyle(fontSize: 15.h, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 10.h),
+          SizedBox(
+            height: 25.h,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: categoryList.length,
+              itemBuilder: (context, index) {
+                final isSelected = selectedCategoryId == index;
 
-          return Padding(
-            padding: EdgeInsets.only(right: 10.w),
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                fixedSize: Size(90.w, 10.h),
-                backgroundColor:
-                    isSelected ? Colors.redAccent[100] : Colors.grey,
-                foregroundColor: isSelected ? Colors.white : Colors.black,
-              ),
-              onPressed: () => onCategorySelected(index),
-              child: Text(categoryList[index]),
+                return Padding(
+                  padding: EdgeInsets.only(right: 10.w),
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      fixedSize: Size(90.w, 1.h),
+                      backgroundColor:
+                          isSelected ? Colors.redAccent[100] : Colors.grey,
+                      foregroundColor: isSelected ? Colors.white : Colors.black,
+                    ),
+                    onPressed: () => onCategorySelected(index),
+                    child: Text(categoryList[index]),
+                  ),
+                );
+              },
             ),
-          );
-        },
+          ),
+        ],
       ),
     );
   }

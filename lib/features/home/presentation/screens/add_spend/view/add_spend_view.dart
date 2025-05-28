@@ -1,217 +1,66 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:todo/features/home/presentation/widgets/drawer.dart';
+import 'package:todo/features/home/presentation/screens/add_spend/model/add_spend_model.dart';
+import 'package:todo/features/home/presentation/screens/add_spend/provider/add_spend_provider.dart';
+import 'package:intl/intl.dart';
 
-final Map<String, double> expenses = {
-  "Yemek": 500,
-  "Ulaşım": 300,
-  "Eğlence": 50,
-  "Fatura": 700,
-  "asasa": 500,
-  "Ulaşdfdım": 300,
-  "Eğlenfce": 50,
-  "Faturda": 400,
-};
-final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 final selectedCategoryProvider = StateProvider<String>((ref) => '');
+final moneyController = TextEditingController();
+final headController = TextEditingController();
+final String spendDate = "";
+final String spendDescription = "";
 
 class AddSpendView extends ConsumerWidget {
   const AddSpendView({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final selected = ref.watch(selectedCategoryProvider);
-
+    final spendsAsync = ref.watch(addSpendProvider);
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.teal,
-        onPressed: () {
-          showModalBottomSheet(
-            backgroundColor: Colors.white,
-            context: context,
-            builder: (BuildContext conntext) {
-              return SizedBox(
-                height: 350.h,
-                child: Padding(
-                  padding: EdgeInsets.all(15.w),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(height: 30.h),
-                      Text(
-                        "Harcanan Yer",
-                        style: TextStyle(
-                          fontSize: 18.sp,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(height: 10.h),
-                      TextFormField(
-                        decoration: InputDecoration(
-                          filled: true,
-                          fillColor: Colors.white,
-                          hintText: "Harcama sebebini giriniz",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8.r),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 20.h),
-                      Text(
-                        "Miktar",
-                        style: TextStyle(
-                          fontSize: 18.sp,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(height: 10.h),
-                      TextFormField(
-                        decoration: InputDecoration(
-                          filled: true,
-                          fillColor: Colors.white,
-                          hintText: "Harcanan miktar",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8.r),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 15.h),
-                      Row(
-                        children: [
-                          Text(
-                            'Kategori:',
-                            style: TextStyle(
-                              fontSize: 18.sp,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Consumer(
-                            builder: (context, ref, _) {
-                              final selected = ref.watch(
-                                selectedCategoryProvider,
-                              );
-                              return PopupMenuButton<String>(
-                                color: Colors.white,
-                                onSelected: (value) {
-                                  ref
-                                      .read(selectedCategoryProvider.notifier)
-                                      .state = value;
-                                },
-                                itemBuilder:
-                                    (context) =>
-                                        spendCategory
-                                            .map(
-                                              (e) => PopupMenuItem<String>(
-                                                value: e,
-                                                child: Text(
-                                                  e,
-                                                  style: TextStyle(
-                                                    fontSize: 15.sp,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                              ),
-                                            )
-                                            .toList(),
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 8,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                      color: Colors.grey.shade300,
-                                    ),
-                                    borderRadius: BorderRadius.circular(6),
-                                    color: Colors.white,
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text(
-                                        selected.isEmpty ? 'Seç' : selected,
-                                        style: TextStyle(
-                                          fontSize: 15.sp,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.teal,
-                                        ),
-                                      ),
-                                      const Icon(Icons.arrow_drop_down),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-
-                      Spacer(),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          ElevatedButton(
-                            style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all(
-                                Colors.teal,
-                              ),
-                            ),
-                            onPressed: () {},
-                            child: Text(
-                              "Ekle",
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 15.sp,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 30.h),
-                    ],
-                  ),
-                ),
-              );
-            },
-          );
-        },
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(50.r),
-        ),
-        child: Icon(Icons.add),
+        onPressed:
+            () => showDialog(
+              context: context,
+              builder: (context) => const AddSpendDialog(),
+            ),
+        child: const Icon(Icons.add),
       ),
-      key: _scaffoldKey,
-      appBar: AppBar(
-        actions: [
-          IconButton(
-            icon: Icon(Icons.notifications, color: Colors.black, size: 30.r),
-            onPressed: () {},
-          ),
-        ],
-        toolbarHeight: 42.h,
-        leading: IconButton(
-          icon: Icon(Icons.menu, color: Colors.white, size: 40.r),
-          onPressed: () {
-            _scaffoldKey.currentState?.openDrawer();
-          },
-        ),
-        title: const Text("Todo App"),
-        centerTitle: true,
-        backgroundColor: Colors.teal,
-      ),
-      drawer: DrawerCard(),
       body: SingleChildScrollView(
         child: Column(
           children: [
             SizedBox(height: 20.h),
-            SpendPieChart(),
+            const SpendPieChart(),
             SizedBox(height: 30.h),
-            SpendingByMonth(),
-            SizedBox(height: 20.h),
-            ExpenseListWidget(expenses: expenses),
+            const SpendingByMonth(),
+            SizedBox(height: 5.h),
+            spendsAsync.when(
+              data:
+                  (spends) => Column(
+                    children:
+                        spends
+                            .map(
+                              (e) => Card(
+                                color: Colors.red[50],
+                                child: ListTile(
+                                  title: Text(e.spendHead),
+                                  subtitle: Text(
+                                    "${e.spendCategory.toUpperCase()} - ${e.spendDate}",
+                                  ),
+                                  trailing: Text(
+                                    "₺${e.spendMoney.toStringAsFixed(2)}",
+                                  ),
+                                ),
+                              ),
+                            )
+                            .toList(),
+                  ),
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (err, stack) => Center(child: Text("Hata: $err")),
+            ),
           ],
         ),
       ),
@@ -219,6 +68,146 @@ class AddSpendView extends ConsumerWidget {
   }
 }
 
+class AddSpendDialog extends ConsumerWidget {
+  const AddSpendDialog({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final selected = ref.watch(selectedCategoryProvider);
+    return AlertDialog(
+      title: Text('Harcama Ekle', style: TextStyle(fontSize: 18.sp)),
+      content: SingleChildScrollView(
+        child: Column(
+          children: [
+            TextFormField(
+              controller: headController,
+              decoration: const InputDecoration(
+                labelText: 'Harcama sebebi',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            SizedBox(height: 12.h),
+            TextFormField(
+              controller: moneyController,
+              decoration: const InputDecoration(
+                labelText: 'Tutar',
+                border: OutlineInputBorder(),
+              ),
+              keyboardType: TextInputType.number,
+            ),
+            SizedBox(height: 12.h),
+            Row(
+              children: [
+                Text("Kategori:", style: TextStyle(fontSize: 16.sp)),
+                const SizedBox(width: 12),
+                PopupMenuButton<String>(
+                  onSelected: (value) {
+                    ref.read(selectedCategoryProvider.notifier).state = value;
+                  },
+                  itemBuilder:
+                      (_) =>
+                          spendCategory
+                              .map(
+                                (e) => PopupMenuItem<String>(
+                                  value: e,
+                                  child: Text(e),
+                                ),
+                              )
+                              .toList(),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 5,
+                    ),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.teal),
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          selected.isEmpty ? 'Seç' : selected,
+                          style: const TextStyle(color: Colors.teal),
+                        ),
+                        const Icon(Icons.arrow_drop_down),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          child: const Text("İptal"),
+          onPressed: () {
+            Navigator.pop(context);
+            moneyController.clear();
+            headController.clear();
+          },
+        ),
+        ElevatedButton(
+          // bu kısıma herhangi bir input alanının boş geçilemeyeceği hakkında kontroller yapılacak
+          onPressed: () async {
+            final spend = AddSpendModel(
+              spendId: Random().nextInt(1 << 32),
+              spendMoney: double.parse(moneyController.text),
+              spendDate: DateFormat('dd/MM/yyyy').format(DateTime.now()),
+              spendCategory: ref.read(selectedCategoryProvider),
+              spendHead: headController.text,
+              spendDescription: spendDescription,
+            );
+            await ref.read(addSpendProvider.notifier).addSpend(spend);
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Harcamalar başarıyla kaydedildi")),
+            );
+            Navigator.pop(context);
+            moneyController.clear();
+            headController.clear();
+          },
+          child: const Text("Ekle"),
+        ),
+      ],
+    );
+  }
+}
+
+class SpendingByMonth extends StatelessWidget {
+  const SpendingByMonth({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 40.h,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: month.length,
+        itemBuilder:
+            (context, index) => Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8.w),
+              child: ElevatedButton(
+                onPressed: () {},
+                child: Text(month[index], style: TextStyle(fontSize: 12.sp)),
+              ),
+            ),
+      ),
+    );
+  }
+}
+
+final Map<String, double> expenses = {
+  "Yemek": 500,
+  "Ulaşım": 300,
+  "Eğlence": 50,
+  "Fatura": 700,
+  "Yemsdek": 500,
+  "sdsds": 300,
+  "Eğlsdsdence": 50,
+  "Fatusdsra": 700,
+};
 List<String> spendCategory = [
   "yemek",
   "Ev",
@@ -229,7 +218,8 @@ List<String> spendCategory = [
   "ihtiyaç",
   "diğer",
 ];
-List month = [
+
+List<String> month = [
   "Ocak",
   "Şubat",
   "Mart",
@@ -244,13 +234,13 @@ List month = [
   "Aralık",
 ];
 
-class SpendPieChart extends StatelessWidget {
+class SpendPieChart extends ConsumerWidget {
   const SpendPieChart({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    double totalExpense = expenses.values.fold(0, (sum, value) => sum + value);
-
+  Widget build(BuildContext context, WidgetRef ref) {
+    final spendsAsync = ref.watch(addSpendProvider);
+    double total = 0;
     return Stack(
       alignment: Alignment.center,
       children: [
@@ -258,35 +248,42 @@ class SpendPieChart extends StatelessWidget {
           height: 300,
           child: PieChart(
             PieChartData(
-              sections:
-                  expenses.entries.map((entry) {
+              sections: spendsAsync.when(
+                data: (spends) {
+                  if (spends.isEmpty) return [];
+                  total = spends.fold<double>(
+                    0,
+                    (sum, e) => sum + e.spendMoney,
+                  );
+                  return spends.asMap().entries.map((entry) {
+                    final e = entry.value;
                     return PieChartSectionData(
-                      titleStyle: TextStyle(fontSize: 12.sp),
-                      value: entry.value,
-                      title: "${entry.key}\n₺${entry.value}",
-
+                      title:
+                          "${e.spendCategory}\n₺${e.spendMoney.toStringAsFixed(2)}",
+                      value: e.spendMoney,
                       color:
-                          Colors.primaries[expenses.keys.toList().indexOf(
-                                entry.key,
-                              ) %
-                              Colors.primaries.length],
+                          Colors.primaries[entry.key % Colors.primaries.length],
                       radius: 80,
+                      titleStyle: TextStyle(fontSize: 12.sp),
                     );
-                  }).toList(),
+                  }).toList();
+                },
+                loading: () => [],
+                error: (err, stack) => [],
+              ),
               centerSpaceRadius: 90,
               sectionsSpace: 3,
             ),
           ),
         ),
         Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
               "Toplam Harcama",
               style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
             ),
             Text(
-              "₺$totalExpense",
+              "₺$total",
               style: TextStyle(
                 fontSize: 18.sp,
                 fontWeight: FontWeight.bold,
@@ -296,81 +293,6 @@ class SpendPieChart extends StatelessWidget {
           ],
         ),
       ],
-    );
-  }
-}
-
-class SpendingByMonth extends StatelessWidget {
-  const SpendingByMonth({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 20.h,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: month.length,
-        itemBuilder: (context, index) {
-          return Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8.w),
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(5.r),
-                ),
-              ),
-              onPressed: () {},
-              child: Text(month[index], style: TextStyle(fontSize: 12.sp)),
-            ),
-          );
-        },
-      ),
-    );
-  }
-}
-
-class ExpenseListWidget extends StatelessWidget {
-  final Map<String, double> expenses;
-
-  const ExpenseListWidget({super.key, required this.expenses});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 10.w),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children:
-            expenses.entries.map((entry) {
-              return Card(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(3.r),
-                ),
-                color: Colors.red[50],
-                shadowColor: Colors.transparent,
-                elevation: 3,
-                margin: EdgeInsets.symmetric(vertical: 2.h),
-                child: ListTile(
-                  leading: Icon(Icons.monetization_on, color: Colors.green),
-                  title: Text(
-                    entry.key,
-                    style: TextStyle(
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  trailing: Text(
-                    "₺${entry.value}",
-                    style: TextStyle(
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.red,
-                    ),
-                  ),
-                ),
-              );
-            }).toList(),
-      ),
     );
   }
 }

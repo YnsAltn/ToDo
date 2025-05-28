@@ -6,8 +6,10 @@ import 'package:todo/features/home/presentation/screens/add_task/view/add_task_v
 import 'package:todo/features/home/presentation/screens/home/view/home_view.dart';
 import 'package:todo/features/home/presentation/screens/settings/views/settings_view.dart';
 import 'package:todo/features/home/presentation/screens/shopping_list/view/shopping_list_view.dart';
+import 'package:todo/features/home/presentation/widgets/drawer.dart';
 
 final selectedIndexProvider = StateProvider<int>((ref) => 0);
+final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -25,6 +27,26 @@ class HomeScreen extends ConsumerWidget {
     ];
 
     return Scaffold(
+      key: _scaffoldKey,
+      appBar: AppBar(
+        actions: [
+          IconButton(
+            icon: Icon(Icons.notifications, color: Colors.black, size: 30.r),
+            onPressed: () {},
+          ),
+        ],
+        toolbarHeight: 42.h,
+        leading: IconButton(
+          icon: Icon(Icons.menu, color: Colors.white, size: 40.r),
+          onPressed: () {
+            _scaffoldKey.currentState?.openDrawer();
+          },
+        ),
+        title: const Text("Todo App"),
+        centerTitle: true,
+        backgroundColor: Colors.teal,
+      ),
+      drawer: DrawerCard(),
       body: IndexedStack(index: selectedIndex, children: pages),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,

@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:todo/features/home/presentation/widgets/drawer.dart';
 
-final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 final selectedIndexProvider = StateProvider<int>((ref) => 0);
 final shoppingListProvider =
     StateNotifierProvider<ShoppingListNotifier, List<ShoppingItem>>(
@@ -49,26 +46,6 @@ class ShoppingListView extends ConsumerWidget {
     final controller = TextEditingController();
 
     return Scaffold(
-      key: _scaffoldKey,
-      appBar: AppBar(
-        actions: [
-          IconButton(
-            icon: Icon(Icons.notifications, color: Colors.black, size: 30.r),
-            onPressed: () {},
-          ),
-        ],
-        toolbarHeight: 42.h,
-        leading: IconButton(
-          icon: Icon(Icons.menu, color: Colors.white, size: 40.r),
-          onPressed: () {
-            _scaffoldKey.currentState?.openDrawer();
-          },
-        ),
-        title: const Text("Todo App"),
-        centerTitle: true,
-        backgroundColor: Colors.teal,
-      ),
-      drawer: DrawerCard(),
       body: Column(
         children: [
           Padding(

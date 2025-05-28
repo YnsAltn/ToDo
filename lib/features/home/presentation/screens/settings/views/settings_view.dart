@@ -1,43 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:todo/features/auth/presentation/screens/login/provider/login_provider.dart';
+import 'package:todo/features/auth/presentation/screens/login/view/login_view.dart';
 import 'package:todo/features/home/presentation/screens/settings/provider/settings_provider.dart';
-import 'package:todo/features/home/presentation/widgets/drawer.dart';
 
-final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-
-class ProfileView extends StatefulWidget {
+class ProfileView extends ConsumerWidget {
   const ProfileView({super.key});
 
   @override
-  State<ProfileView> createState() => _ProfileViewState();
-}
-
-class _ProfileViewState extends State<ProfileView> {
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      key: _scaffoldKey,
-      appBar: AppBar(
-        actions: [
-          IconButton(
-            icon: Icon(Icons.notifications, color: Colors.black, size: 30.r),
-            onPressed: () {},
-          ),
-        ],
-        toolbarHeight: 42.h,
-        leading: IconButton(
-          icon: Icon(Icons.menu, color: Colors.white, size: 40.r),
-          onPressed: () {
-            _scaffoldKey.currentState?.openDrawer();
-          },
-        ),
-        title: const Text("Todo App"),
-        centerTitle: true,
-        backgroundColor: Colors.teal,
-      ),
-      drawer: DrawerCard(),
       body: ListView(
         children: [
           ListTile(
@@ -116,12 +89,51 @@ class _ProfileViewState extends State<ProfileView> {
           ),
           Divider(),
           ListTile(
-            leading: Icon(Icons.delete),
-            title: Text("Delete Account"),
-            onTap: () {},
+            leading: Icon(Icons.logout),
+            title: Text("Çıkış Yap"),
+            onTap: () async {
+              _showAlertDialog(context, ref);
+            },
           ),
         ],
       ),
     );
   }
+}
+
+_showAlertDialog(BuildContext context, WidgetRef ref) {
+  final authService = ref.read(authServiceProvider);
+  AlertDialog alert = AlertDialog(
+    title: Text(
+      "Uyarı",
+      style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+    ),
+    content: Text("Çıkış yapmak istediğinden emin misin?"),
+    actions: [
+      TextButton(
+        child: Text("Hayır"),
+        onPressed: () {
+          Navigator.pop(context);
+        },
+      ),
+      TextButton(
+        child: Text("Evet"),
+        onPressed: () async {
+          await authService.signOut();
+
+          Navigator.pop(context);
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => LoginView()),
+          );
+        },
+      ),
+    ],
+  );
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return alert;
+    },
+  );
 }
