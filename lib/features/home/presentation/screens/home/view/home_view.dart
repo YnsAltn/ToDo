@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:todo/features/home/presentation/screens/add_spend/provider/add_spend_provider.dart';
+import 'package:todo/home.dart';
 
 var now = DateTime.now();
 var year = now.year;
@@ -22,7 +24,14 @@ class _HomeViewState extends ConsumerState<HomeView> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
-        child: Column(children: [DateWidget(), TasksWidget()]),
+        child: Column(
+          children: [
+            DateWidget(),
+            TasksWidget(),
+            ShopingWidget(),
+            SpendsWidget(),
+          ],
+        ),
       ),
     );
   }
@@ -107,13 +116,13 @@ class DateWidget extends StatelessWidget {
   }
 }
 
-class TasksWidget extends StatelessWidget {
+class TasksWidget extends ConsumerWidget {
   const TasksWidget({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Padding(
-      padding: EdgeInsets.all(15.h),
+      padding: EdgeInsets.symmetric(horizontal: 15.w),
       child: Column(
         children: [
           Card(
@@ -129,7 +138,21 @@ class TasksWidget extends StatelessWidget {
               trailing: Icon(Icons.task, size: 30.r),
             ),
           ),
-          SizedBox(height: 10.h),
+        ],
+      ),
+    );
+  }
+}
+
+class ShopingWidget extends ConsumerWidget {
+  const ShopingWidget({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 15.w),
+      child: Column(
+        children: [
           Card(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(5.r),
@@ -141,22 +164,61 @@ class TasksWidget extends StatelessWidget {
               ),
               trailing: Icon(Icons.shopping_cart, size: 30.r),
               subtitle: Text("Tamamlanmamış alışverişin var."),
+              onTap: () {
+                ref.read(selectedIndexProvider.notifier).state = 2;
+                // bu kısımda direkt statteki navigationar indexini değiştirerek sayfanın değişmesini sağladık.
+              },
             ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class SpendsWidget extends ConsumerWidget {
+  const SpendsWidget({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final spendsAsync = ref.watch(addSpendProvider);
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 15.w),
+      child: Column(
+        children: [
+          spendsAsync.when(
+            data: (spendList) {
+              final totalSpend = spendList.fold<double>(
+                0.0,
+                (sum, item) => sum + item.spendMoney,
+              );
+              return Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5.r),
+                ),
+                child: ListTile(
+                  title: Text(
+                    "Harcamalarım.",
+                    style: TextStyle(
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  trailing: Icon(Icons.money, size: 30.r),
+                  subtitle: Text(
+                    "Şubat ayının toplam harcaması: ${totalSpend.toStringAsFixed(2)} ₺",
+                  ),
+                  onTap: () {
+                    ref.read(selectedIndexProvider.notifier).state = 3;
+                    // bu kısımda direkt statteki navigationar indexini değiştirerek sayfanın değişmesini sağladık.
+                  },
+                ),
+              );
+            },
+            loading: () => CircularProgressIndicator(),
+            error: (e, _) => Text("Harcama verisi alınamadı: $e"),
           ),
           SizedBox(height: 10.h),
-          Card(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(5.r),
-            ),
-            child: ListTile(
-              title: Text(
-                "Harcamalarım.",
-                style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
-              ),
-              trailing: Icon(Icons.money, size: 30.r),
-              subtitle: Text("Bu ayki toplam harcaman 2000 TL."),
-            ),
-          ),
           ElevatedButton(onPressed: () {}, child: Text("Detaylara Git")),
         ],
       ),

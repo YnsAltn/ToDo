@@ -46,12 +46,16 @@ class AddSpendView extends ConsumerWidget {
                               (e) => Card(
                                 color: Colors.red[50],
                                 child: ListTile(
-                                  title: Text(e.spendHead),
+                                  title: Text(e.spendHead.toUpperCase()),
                                   subtitle: Text(
                                     "${e.spendCategory.toUpperCase()} - ${e.spendDate}",
                                   ),
                                   trailing: Text(
                                     "₺${e.spendMoney.toStringAsFixed(2)}",
+                                    style: TextStyle(
+                                      color: Colors.red,
+                                      fontSize: 14.sp,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -259,7 +263,7 @@ class SpendPieChart extends ConsumerWidget {
                     final e = entry.value;
                     return PieChartSectionData(
                       title:
-                          "${e.spendCategory}\n₺${e.spendMoney.toStringAsFixed(2)}",
+                          "${e.spendCategory.toUpperCase()}\n₺${e.spendMoney.toStringAsFixed(2)}",
                       value: e.spendMoney,
                       color:
                           Colors.primaries[entry.key % Colors.primaries.length],

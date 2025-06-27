@@ -2,182 +2,156 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:todo/features/auth/presentation/screens/login/provider/login_provider.dart';
-import 'package:todo/features/auth/presentation/screens/login/view/login_view.dart';
+import 'package:todo/features/home/presentation/screens/home/view/home_view.dart';
 
-final agreementProvider = StateProvider<bool>((ref) => false);
-
-class RegisterView extends ConsumerWidget {
-  RegisterView({super.key});
-
-  final emailController = TextEditingController();
-  final passwordController1 = TextEditingController();
-  final passwordController2 = TextEditingController();
+class RegisterView extends ConsumerStatefulWidget {
+  const RegisterView({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<RegisterView> createState() => _RegisterViewState();
+}
+
+class _RegisterViewState extends ConsumerState<RegisterView> {
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Column(
-              children: [
-                SizedBox(
-                  height: 200.h,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "Kayıt Ol",
-                            style: TextStyle(
-                              fontSize: 50.sp,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "Hesabını Oluştur",
-                            style: TextStyle(
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.w),
+      appBar: AppBar(
+        title: const Text('Kayıt Ol'),
+        backgroundColor: Colors.teal,
+        foregroundColor: Colors.white,
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.all(20.h),
+            child: Form(
+              key: _formKey,
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   TextFormField(
-                    controller: emailController,
+                    controller: _emailController,
                     decoration: InputDecoration(
-                      hintText: "E-posta",
-                      filled: true,
-                      fillColor: Colors.grey.shade200,
-                      prefixIcon: Icon(Icons.person),
+                      labelText: 'E-posta',
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10.r),
                       ),
+                      prefixIcon: const Icon(Icons.email),
                     ),
+                    keyboardType: TextInputType.emailAddress,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Lütfen e-posta adresinizi girin';
+                      }
+                      if (!value.contains('@')) {
+                        return 'Geçerli bir e-posta adresi girin';
+                      }
+                      return null;
+                    },
                   ),
                   SizedBox(height: 20.h),
                   TextFormField(
-                    obscureText: true,
-                    controller: passwordController1,
+                    controller: _passwordController,
                     decoration: InputDecoration(
-                      hintText: "Şifre",
-                      filled: true,
-                      fillColor: Colors.grey.shade200,
-                      prefixIcon: Icon(Icons.lock),
+                      labelText: 'Şifre',
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10.r),
                       ),
+                      prefixIcon: const Icon(Icons.lock),
                     ),
+                    obscureText: true,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Lütfen şifrenizi girin';
+                      }
+                      if (value.length < 6) {
+                        return 'Şifre en az 6 karakter olmalıdır';
+                      }
+                      return null;
+                    },
                   ),
                   SizedBox(height: 20.h),
                   TextFormField(
-                    obscureText: true,
-                    controller: passwordController2,
+                    controller: _confirmPasswordController,
                     decoration: InputDecoration(
-                      hintText: "Şifre",
-                      filled: true,
-                      fillColor: Colors.grey.shade200,
-                      prefixIcon: Icon(Icons.lock),
+                      labelText: 'Şifre Tekrar',
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10.r),
                       ),
+                      prefixIcon: const Icon(Icons.lock_outline),
                     ),
+                    obscureText: true,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Lütfen şifrenizi tekrar girin';
+                      }
+                      if (value != _passwordController.text) {
+                        return 'Şifreler eşleşmiyor';
+                      }
+                      return null;
+                    },
                   ),
-                  SizedBox(height: 20.h),
-                  ListTile(
-                    title: Text("Sözleşmeyi kabul ediyorum"),
-                    leading: Switch(
-                      value: ref.watch(agreementProvider),
-                      onChanged:
-                          (value) =>
-                              ref.read(agreementProvider.notifier).state =
-                                  value,
-                    ),
-                  ),
-                  SizedBox(height: 20.h),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      fixedSize: Size(320.w, 45.h),
-                      backgroundColor: Colors.grey,
-                    ),
-                    onPressed:
-                        () => _doRegister(
-                          context,
-                          ref,
-                          passwordController1,
-                          passwordController2,
-                          emailController,
-                        ),
-                    child: Text(
-                      "KAYIT OL",
-                      style: TextStyle(
-                        fontSize: 25.sp,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
+                  SizedBox(height: 30.h),
+                  _buildRegisterButton(),
                 ],
               ),
             ),
-          ],
+          ),
         ),
       ),
     );
   }
-}
 
-Future<dynamic> _doRegister(
-  BuildContext context,
-  WidgetRef ref,
-  dynamic passwordController1,
-  dynamic passwordController2,
-  dynamic emailController,
-) async {
-  final email = emailController.text.trim();
-  final pass1 = passwordController1.text.trim();
-  final pass2 = passwordController2.text.trim();
+  Widget _buildRegisterButton() {
+    return ElevatedButton(
+      onPressed: () async {
+        if (_formKey.currentState!.validate()) {
+          try {
+            final authService = ref.read(authServiceProvider);
+            await authService.createUser(
+              email: _emailController.text.trim(),
+              password: _passwordController.text,
+            );
 
-  if (email.isEmpty || pass1.isEmpty || pass2.isEmpty) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text("Lütfen tüm alanları doldurun.")));
-    return;
-  }
-
-  if (pass1 != pass2) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text("Şifreler aynı olmalı.")));
-    return;
-  }
-  final authService = ref.read(authServiceProvider);
-
-  try {
-    await authService.createUser(email: email, password: pass1);
-    if (!context.mounted) return;
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => LoginView()),
+            if (mounted) {
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(builder: (_) => const HomeView()),
+              );
+            }
+          } catch (e) {
+            if (mounted) {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text('Kayıt hatası: $e')));
+            }
+          }
+        }
+      },
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.teal,
+        foregroundColor: Colors.white,
+        padding: EdgeInsets.symmetric(vertical: 15.h),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.r),
+        ),
+      ),
+      child: Text(
+        'Kayıt Ol',
+        style: TextStyle(fontSize: 16.h, fontWeight: FontWeight.bold),
+      ),
     );
-  } catch (e) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text("Kayıt başarısız.")));
   }
 }

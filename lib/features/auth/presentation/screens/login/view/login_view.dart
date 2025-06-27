@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:todo/features/auth/presentation/screens/login/provider/login_provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:todo/features/auth/presentation/screens/login/service/login_service.dart';
 import 'package:todo/features/auth/presentation/screens/register/register_view.dart';
 import 'package:todo/home.dart';
 

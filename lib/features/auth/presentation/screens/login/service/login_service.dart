@@ -30,7 +30,12 @@ class AuthService {
     if (user == null) debugPrint('Kullanıcı bulunamadı');
 
     final userToken = await user?.getIdToken();
+    final uid = user?.uid ?? '';
+
     debugPrint("🔥 Token başarıyla alındı: $userToken");
+    debugPrint("🔐 Kullanıcı UID: $uid");
+
+    await saveUserData(email: email, uid: uid, userToken: userToken ?? '');
 
     return LoginModel(
       email: email,
@@ -52,7 +57,19 @@ class AuthService {
     final UserCredential userCredential = await _firebaseAuth
         .signInWithCredential(credential);
 
-    return userCredential.user;
+    final user = userCredential.user;
+    final userToken = await user?.getIdToken();
+    final uid = user?.uid ?? '';
+
+    if (user != null) {
+      await saveUserData(
+        email: user.email ?? '',
+        uid: uid,
+        userToken: userToken ?? '',
+      );
+    }
+
+    return user;
   }
 
   Future<void> signOut() async {
@@ -60,9 +77,14 @@ class AuthService {
     await _googleSignIn.signOut();
   }
 
-  Future<void> saveUserData(String email, String userToken) async {
+  Future<void> saveUserData({
+    required String email,
+    required String uid,
+    required String userToken,
+  }) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('email', email);
-    await prefs.setString('user_id', userToken);
+    await prefs.setString('uid', uid);
+    await prefs.setString('userToken', userToken);
   }
 }

@@ -1,99 +1,63 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:todo/features/auth/presentation/screens/login/provider/login_provider.dart';
 import 'package:todo/features/auth/presentation/screens/login/view/login_view.dart';
-import 'package:todo/features/home/presentation/screens/settings/provider/settings_provider.dart';
 
-class ProfileView extends ConsumerWidget {
-  const ProfileView({super.key});
+class SettingsView extends ConsumerWidget {
+  const SettingsView({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Ayarlar'),
+        backgroundColor: Colors.teal,
+        foregroundColor: Colors.white,
+      ),
       body: ListView(
         children: [
           ListTile(
-            leading: Icon(Icons.sunny),
-            title: Text("Koyu Mod"),
-            trailing: Consumer(
-              builder: (context, ref, child) {
-                final settings = ref.watch(settingsProvider);
-                return Switch(
-                  value: settings.isDarkMode,
-                  onChanged:
-                      (_) =>
-                          ref.read(settingsProvider.notifier).toggleDarkMode(),
-                );
-              },
-            ),
-          ),
-
-          ListTile(
-            leading: Icon(Icons.sync),
-            title: Text("Sync Automatically"),
-            trailing: Consumer(
-              builder: (context, ref, child) {
-                final settings = ref.watch(settingsProvider);
-                return Switch(
-                  value: settings.isSyncOn,
-                  onChanged:
-                      (_) => ref.read(settingsProvider.notifier).toggleSync(),
-                );
-              },
-            ),
-          ),
-          ListTile(
-            leading: Icon(Icons.notifications),
-            title: Text("Bildirimler"),
-            trailing: Consumer(
-              builder: (context, ref, child) {
-                final settings = ref.watch(settingsProvider);
-                return Switch(
-                  value: settings.areNotificationsEnabled,
-                  onChanged:
-                      (_) =>
-                          ref
-                              .read(settingsProvider.notifier)
-                              .toggleNotifications(),
-                );
-              },
-            ),
-          ),
-
-          GestureDetector(
-            child: ListTile(
-              leading: Icon(Icons.share),
-              title: Text("Arkadaşlarınızı Davet Edin"),
-            ),
+            leading: const Icon(Icons.person_outline),
+            title: const Text('Profil'),
             onTap: () {
-              Share.share(
-                "Bu kısımda uygulamanın indirme linki olacak veya QR kodu olacak.",
-              );
+              // TODO: Profil sayfasına yönlendir
             },
           ),
           ListTile(
-            leading: Icon(Icons.language),
-            title: Text("Language"),
-            trailing: DropdownButton<String>(
-              value: "EN",
-              onChanged: (String? newValue) {},
-              items:
-                  ["EN", "TR", "DE"]
-                      .map(
-                        (lang) =>
-                            DropdownMenuItem(value: lang, child: Text(lang)),
-                      )
-                      .toList(),
-            ),
-          ),
-          Divider(),
-          ListTile(
-            leading: Icon(Icons.logout),
-            title: Text("Çıkış Yap"),
-            onTap: () async {
-              _showAlertDialog(context, ref);
+            leading: const Icon(Icons.notifications_outlined),
+            title: const Text('Bildirimler'),
+            onTap: () {
+              // TODO: Bildirim ayarları sayfasına yönlendir
             },
+          ),
+          ListTile(
+            leading: const Icon(Icons.lock_outline),
+            title: const Text('Gizlilik'),
+            onTap: () {
+              // TODO: Gizlilik ayarları sayfasına yönlendir
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.help_outline),
+            title: const Text('Yardım'),
+            onTap: () {
+              // TODO: Yardım sayfasına yönlendir
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.info_outline),
+            title: const Text('Hakkında'),
+            onTap: () {
+              // TODO: Hakkında sayfasına yönlendir
+            },
+          ),
+          const Divider(),
+          ListTile(
+            leading: const Icon(Icons.logout, color: Colors.red),
+            title: const Text('Çıkış Yap', style: TextStyle(color: Colors.red)),
+            onTap: () => _showAlertDialog(context, ref),
           ),
         ],
       ),
@@ -101,39 +65,35 @@ class ProfileView extends ConsumerWidget {
   }
 }
 
-_showAlertDialog(BuildContext context, WidgetRef ref) {
-  final authService = ref.read(authServiceProvider);
-  AlertDialog alert = AlertDialog(
-    title: Text(
-      "Uyarı",
-      style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
-    ),
-    content: Text("Çıkış yapmak istediğinden emin misin?"),
-    actions: [
-      TextButton(
-        child: Text("Hayır"),
-        onPressed: () {
-          Navigator.pop(context);
-        },
-      ),
-      TextButton(
-        child: Text("Evet"),
-        onPressed: () async {
-          await authService.signOut();
-
-          Navigator.pop(context);
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => LoginView()),
-          );
-        },
-      ),
-    ],
-  );
+void _showAlertDialog(BuildContext context, WidgetRef ref) {
   showDialog(
     context: context,
     builder: (BuildContext context) {
-      return alert;
+      return AlertDialog(
+        title: const Text(
+          "Uyarı",
+          style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+        ),
+        content: const Text("Çıkış yapmak istediğinizden emin misiniz?"),
+        actions: [
+          TextButton(
+            child: const Text("Hayır"),
+            onPressed: () => Navigator.pop(context),
+          ),
+          TextButton(
+            child: const Text("Evet"),
+            onPressed: () async {
+              await ref.read(authServiceProvider).signOut();
+              if (context.mounted) {
+                Navigator.pop(context);
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (_) => LoginView()),
+                );
+              }
+            },
+          ),
+        ],
+      );
     },
   );
 }

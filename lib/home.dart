@@ -18,12 +18,12 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedIndex = ref.watch(selectedIndexProvider);
 
-    final pages = const [
-      HomeView(),
-      AddNewTaskView(),
-      ShoppingListView(),
-      AddSpendView(),
-      ProfileView(),
+    final pages = [
+      const HomeView(),
+      const AddNewTaskView(),
+      const ShoppingListView(),
+      const AddSpendView(),
+      const SettingsView(),
     ];
 
     return Scaffold(
@@ -31,43 +31,85 @@ class HomeScreen extends ConsumerWidget {
       appBar: AppBar(
         actions: [
           IconButton(
-            icon: Icon(Icons.notifications, color: Colors.black, size: 30.r),
-            onPressed: () {},
+            icon: Icon(
+              Icons.notifications_outlined,
+              color: Colors.white,
+              size: 24.r,
+            ),
+            onPressed: () {
+              // TODO: Bildirimler sayfasına yönlendir
+            },
           ),
+          SizedBox(width: 8.w),
         ],
-        toolbarHeight: 42.h,
+        toolbarHeight: 56.h,
         leading: IconButton(
-          icon: Icon(Icons.menu, color: Colors.white, size: 40.r),
+          icon: Icon(Icons.menu, color: Colors.white, size: 24.r),
           onPressed: () {
             _scaffoldKey.currentState?.openDrawer();
           },
         ),
-        title: const Text("Todo App"),
+        title: const Text(
+          "Todo App",
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
         centerTitle: true,
         backgroundColor: Colors.teal,
-      ),
-      drawer: DrawerCard(),
-      body: IndexedStack(index: selectedIndex, children: pages),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.white,
         elevation: 0,
-        selectedItemColor: Colors.teal,
-        unselectedItemColor: Colors.grey,
-        currentIndex: selectedIndex,
-        onTap:
-            (index) => ref.read(selectedIndexProvider.notifier).state = index,
-        items: [
-          _buildNavItem(Icons.home, 'Ana Sayfa', selectedIndex == 0),
-          _buildNavItem(Icons.add_task, 'Görev Ekle', selectedIndex == 1),
-          _buildNavItem(
-            Icons.shopping_bag_outlined,
-            'Alışveriş',
-            selectedIndex == 2,
+      ),
+      drawer: const DrawerCard(),
+      body: IndexedStack(index: selectedIndex, children: pages),
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, -5),
+            ),
+          ],
+        ),
+        child: BottomNavigationBar(
+          type: BottomNavigationBarType.fixed,
+          backgroundColor: Colors.white,
+          elevation: 0,
+          selectedItemColor: Colors.teal,
+          unselectedItemColor: Colors.grey,
+          selectedLabelStyle: TextStyle(
+            fontSize: 12.sp,
+            fontWeight: FontWeight.w600,
           ),
-          _buildNavItem(Icons.attach_money, 'Harcama', selectedIndex == 3),
-          _buildNavItem(Icons.person, 'Profil', selectedIndex == 4),
-        ],
+          unselectedLabelStyle: TextStyle(
+            fontSize: 12.sp,
+            fontWeight: FontWeight.w500,
+          ),
+          currentIndex: selectedIndex,
+          onTap:
+              (index) => ref.read(selectedIndexProvider.notifier).state = index,
+          items: [
+            _buildNavItem(Icons.home_outlined, 'Ana Sayfa', selectedIndex == 0),
+            _buildNavItem(
+              Icons.add_task_outlined,
+              'Görev Ekle',
+              selectedIndex == 1,
+            ),
+            _buildNavItem(
+              Icons.shopping_bag_outlined,
+              'Alışveriş',
+              selectedIndex == 2,
+            ),
+            _buildNavItem(
+              Icons.attach_money_outlined,
+              'Harcama',
+              selectedIndex == 3,
+            ),
+            _buildNavItem(
+              Icons.settings_outlined,
+              'Ayarlar',
+              selectedIndex == 4,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -79,14 +121,18 @@ class HomeScreen extends ConsumerWidget {
   ) {
     return BottomNavigationBarItem(
       icon: AnimatedContainer(
-        height: 30.h,
-        duration: Duration(milliseconds: 1000),
-        padding: EdgeInsets.all(5.h),
+        height: 40.h,
+        duration: const Duration(milliseconds: 200),
+        padding: EdgeInsets.all(8.h),
         decoration: BoxDecoration(
           color: isActive ? Colors.teal.withOpacity(0.1) : Colors.transparent,
-          borderRadius: BorderRadius.circular(10.r),
+          borderRadius: BorderRadius.circular(12.r),
         ),
-        child: Icon(icon, size: isActive ? 28 : 24),
+        child: Icon(
+          icon,
+          size: isActive ? 24.r : 22.r,
+          color: isActive ? Colors.teal : Colors.grey,
+        ),
       ),
       label: label,
     );
